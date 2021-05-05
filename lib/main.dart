@@ -26,13 +26,20 @@ class WaterTracker extends StatefulWidget {
 
 class _WaterTrackerState extends State<WaterTracker> {
 
+  // Measures
+  double _dailyGoal = 11.0;
+  double _waterConsumed = 0.0;
+  int _consumedPercentage = 0;
+
   final _headerTextStyle = TextStyle(
+    fontFamily: 'Nunito',
     fontSize: 35,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.bold,
     color: Colors.black,
   );
   final _descTextStyle = TextStyle(
+    fontFamily: 'NunitoSans',
     fontSize: 18,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.normal,
@@ -44,8 +51,8 @@ class _WaterTrackerState extends State<WaterTracker> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.systemGrey.withOpacity(0.01),
-        leading: CupertinoButton(child: Icon(CupertinoIcons.back)),
-        trailing: CupertinoButton(child: Icon(CupertinoIcons.bell)),
+        leading: CupertinoButton(child: Icon(CupertinoIcons.back, color: Colors.black,), onPressed: (){},),
+        trailing: CupertinoButton(child: Icon(CupertinoIcons.bell, color: Colors.black,), onPressed: (){},),
       ),
       child: Container(
         decoration: BoxDecoration(color: Colors.white),
@@ -72,14 +79,14 @@ class _WaterTrackerState extends State<WaterTracker> {
                       style: _descTextStyle,
                     ),
                   ),
-                  margin: EdgeInsets.all(10.0)
+                  margin: EdgeInsets.only(left: 10.0, bottom: 10.0)
               ),
               Container(
                   child: Align (
                     alignment: Alignment.center,
                     child: _drawDroplet(),
                   ),
-                  margin: EdgeInsets.all(10.0)
+                  margin: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0)
               ),
             ],
           ),
@@ -93,28 +100,26 @@ class _WaterTrackerState extends State<WaterTracker> {
 
     // Font Styles
     final _pcntStyle = TextStyle(
+      fontFamily: 'Nunito',
       fontWeight: FontWeight.bold,
       fontSize: 70,
       fontStyle: FontStyle.normal,
       color: Colors.black,
     );
     final _measureStyle = TextStyle(
+      fontFamily: 'Nunito',
       fontWeight: FontWeight.normal,
       fontSize: 33,
       fontStyle: FontStyle.normal,
       color: Color(0xffB2B2B2),
     );
     final _buttonTxtStyle = TextStyle(
+      fontFamily: 'Nunito',
       fontSize: 13,
       fontWeight: FontWeight.bold,
       fontStyle: FontStyle.normal,
       color: Colors.black,
     );
-
-    // Measures
-    final _dailyGoal = 11.0;
-    final _waterConsumed = 5.0;
-    final _consumedPercentage = ((_waterConsumed / _dailyGoal) * 100).round();
 
     return Container(
       child: Column(
@@ -138,7 +143,7 @@ class _WaterTrackerState extends State<WaterTracker> {
           Container(
             alignment: Alignment.center,
             child: Text(
-              '$_waterConsumed / $_dailyGoal',
+              '$_waterConsumed' + 'l / ' + '$_dailyGoal' + 'l',
               textDirection: TextDirection.ltr,
               style: _measureStyle,
             ),
@@ -147,12 +152,13 @@ class _WaterTrackerState extends State<WaterTracker> {
             margin: EdgeInsets.symmetric(vertical: 10),
             alignment: Alignment.center,
             child: CupertinoButton(
-              color: Color(0x1aF2F2F2),
+              color: Color(0xffEAF1F4),
               child: Text(
                 'Daily Goal',
                 style: _buttonTxtStyle,
               ),
               borderRadius: BorderRadius.circular(30.0),
+              onPressed: (){},
             )
           ),
           Container(
@@ -168,8 +174,9 @@ class _WaterTrackerState extends State<WaterTracker> {
                   padding: EdgeInsets.all(16),
                   onPressed: () {
                     setState(() {
-                      if (_waterConsumed >= 0) {
-                        _waterConsumed -= 1;
+                      if (_waterConsumed > 0) {
+                        _waterConsumed -= 0.250;
+                        _consumedPercentage = ((_waterConsumed / _dailyGoal) * 100).round();
                       }
                     });
                   },
@@ -179,6 +186,14 @@ class _WaterTrackerState extends State<WaterTracker> {
                   color: Color(0xff6FA9C2),
                   borderRadius: BorderRadius.circular(30.0),
                   padding: EdgeInsets.all(16),
+                  onPressed: () {
+                    setState(() {
+                      if (_waterConsumed < _dailyGoal) {
+                        _waterConsumed += 0.250;
+                        _consumedPercentage = ((_waterConsumed / _dailyGoal) * 100).round();
+                      }
+                    });
+                  },
                 )
               ],
             ),
