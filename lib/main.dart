@@ -81,12 +81,15 @@ class _WaterTrackerState extends State<WaterTracker> {
                   ),
                   margin: EdgeInsets.only(left: 10.0, bottom: 10.0)
               ),
-              Container(
-                  child: Align (
-                    alignment: Alignment.center,
-                    child: _drawDroplet(),
-                  ),
-                  margin: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0)
+              Flexible(
+                flex: 2,
+                child: Container(
+                    child: Align (
+                      alignment: Alignment.center,
+                      child: _drawDroplet(),
+                    ),
+                    margin: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0)
+                ),
               ),
             ],
           ),
@@ -115,11 +118,40 @@ class _WaterTrackerState extends State<WaterTracker> {
     );
     final _buttonTxtStyle = TextStyle(
       fontFamily: 'Nunito',
-      fontSize: 13,
+      fontSize: 18,
       fontWeight: FontWeight.bold,
       fontStyle: FontStyle.normal,
       color: Colors.black,
     );
+    final _popupTextHeaderStyle = TextStyle(
+      fontFamily: 'Nunito',
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      fontStyle: FontStyle.normal,
+      color: Colors.black,
+    );
+    final _pickerTextStyle = TextStyle(
+      fontFamily: 'Nunito',
+      fontSize: 25,
+      fontWeight: FontWeight.bold,
+      fontStyle: FontStyle.normal,
+      color: Colors.black,
+    );
+    final _popupButtonTextStyle = TextStyle(
+      fontFamily: 'Nunito',
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      fontStyle: FontStyle.normal,
+      color: Colors.white,
+    );
+    final _bottomWidgetHeight = 500.0;
+
+    // Selected item
+    int _chosenMain = 0;
+    int _chosenDetail = 0;
+    List<int> _mainMeasure = List<int>.generate(12, (index) => index+1);
+    List<int> _detailMeasure = List<int>.generate(60, (index) => index);
+    List<String> _units = ['l'];
 
     return Container(
       child: Column(
@@ -149,7 +181,7 @@ class _WaterTrackerState extends State<WaterTracker> {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 10),
+            margin: EdgeInsets.symmetric(vertical: 7),
             alignment: Alignment.center,
             child: CupertinoButton(
               color: Color(0xffEAF1F4),
@@ -158,7 +190,142 @@ class _WaterTrackerState extends State<WaterTracker> {
                 style: _buttonTxtStyle,
               ),
               borderRadius: BorderRadius.circular(30.0),
-              onPressed: (){},
+              onPressed: (){
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: _bottomWidgetHeight,
+                        child: SafeArea(
+                            child: Container(
+                                decoration: BoxDecoration(color: CupertinoColors.white),
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            child: Container(
+                                              margin: EdgeInsets.only(left: 15.0),
+                                              child: Text('Change your daily goal', style: _popupTextHeaderStyle),
+                                            ),
+                                            flex: 2,
+                                          ),
+                                          CupertinoButton(
+                                            child: Icon(CupertinoIcons.clear, color: CupertinoColors.black,),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 250,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            flex: 2,
+                                            child: ListWheelScrollView.useDelegate(
+                                              itemExtent: 60,
+                                              diameterRatio: 2,
+                                              perspective: 0.005,
+                                              squeeze: 2,
+                                              useMagnifier: true,
+                                              magnification: 1.5,
+                                              overAndUnderCenterOpacity: 0.5,
+                                              physics: FixedExtentScrollPhysics(),
+                                              childDelegate: ListWheelChildLoopingListDelegate(
+                                                  children: [
+                                                    for (var i in _mainMeasure) Center(
+                                                      child: Text(i.toString(), style: _pickerTextStyle,),
+                                                    )
+                                                  ]
+                                              ),
+                                              onSelectedItemChanged: (int index) {
+                                                _chosenMain = index;
+                                                // print("Main chosen: $_chosenMain");
+                                              },
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 2,
+                                            child: ListWheelScrollView.useDelegate(
+                                              itemExtent: 60,
+                                              diameterRatio: 2,
+                                              perspective: 0.005,
+                                              squeeze: 2,
+                                              useMagnifier: true,
+                                              magnification: 1.5,
+                                              overAndUnderCenterOpacity: 0.5,
+                                              physics: FixedExtentScrollPhysics(),
+                                              childDelegate: ListWheelChildLoopingListDelegate(
+                                                children: [
+                                                  for (var i in _detailMeasure) Center(
+                                                    child: Text(i.toString().length == 1 ? '0'+i.toString() : i.toString(), style: _pickerTextStyle,),
+                                                  )
+                                                ],
+                                              ),
+                                              onSelectedItemChanged: (int index) {
+                                                _chosenDetail = index;
+                                                // print("Detail chosen: $_chosenDetail");
+                                              },
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 1,
+                                            child: ListWheelScrollView(
+                                              itemExtent: 60,
+                                              diameterRatio: 2,
+                                              perspective: 0.005,
+                                              squeeze: 2,
+                                              useMagnifier: true,
+                                              magnification: 1.5,
+                                              overAndUnderCenterOpacity: 0.5,
+                                              physics: FixedExtentScrollPhysics(),
+                                              children: [for (var i in _units) Center(child: Text(i, style: _pickerTextStyle,),)],
+                                              onSelectedItemChanged: (int index) {
+
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      child: CupertinoButton(
+                                        child: Text('Set Daily Goal', style: _popupButtonTextStyle,),
+                                        color: Color(0xffF1768A),
+                                        onPressed: () {
+                                          double _setGoal = _mainMeasure[_chosenMain] + (_detailMeasure[_chosenDetail] * 0.01);
+                                          // print ("Chosen daily goal: $_setGoal");
+
+                                          if(_waterConsumed < _setGoal) {
+                                            _dailyGoal = _setGoal;
+                                          } else {
+                                            _dailyGoal = _waterConsumed;
+                                          }
+
+                                          Navigator.of(context).pop();
+
+                                          setState(() {
+                                            _consumedPercentage = ((_waterConsumed / _dailyGoal) * 100).round();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                      );
+                    }
+                );
+              },
             )
           ),
           Container(
